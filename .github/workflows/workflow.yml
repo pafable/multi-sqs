@@ -1,0 +1,52 @@
+name: Multi SQS Deployment
+
+on:
+  push:
+    branches:
+      - master
+
+jobs:
+  Deploy-To-Dev:
+    name: "Deploying Multi SQS Deployment Alerts to Dev"
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    strategy:
+      fail-fast: true
+
+    steps:
+      - name: "Checkout"
+        uses: actions/checkout@v2
+
+      - name: Configuring Snyk
+        uses: snyk/actions/setup@0.3.0
+
+      - name: Checking Terraform Code for security vulnerabilities
+        run: snyk iac test
+        working-directory: engine-cpu-utilization
+        env:
+          SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
+
+      - name: Configuring AWS Creds
+        uses: aws-actions/configure-aws-credentials@v1
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: ${{ secrets.AWS_BACKEND_REGION }}
+
+      - name: Initializing Terraform
+        run: |
+          terraform init \
+            -backend-config "bucket=${{ secrets.AWS_S3_BACKEND }}" \
+            -backend-config "region=${{ secrets.AWS_BACKEND_REGION }}" \
+            -backend-config "encrypt=true" \
+            -backend-config "key=multi-sqs.tfstate"
+
+      - name: Creating Terraform Plan
+        run: |
+          terraform workspace new Dev || terraform workspace select Dev
+          terraform plan \
+            -var='workspace_iam_roles={"dev":"${{ DEV_AWS_ROLE }}","prod":"${{ PROD_AWS_ROLE }}"}' \
+            -out plan
+
+      - name: Deploying Multi SQS
+        run: terraform apply plan
