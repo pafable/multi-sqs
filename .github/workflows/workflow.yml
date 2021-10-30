@@ -22,7 +22,6 @@ jobs:
 
       - name: Checking Terraform Code for security vulnerabilities
         run: snyk iac test
-        working-directory: engine-cpu-utilization
         env:
           SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
 
