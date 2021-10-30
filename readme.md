@@ -1,5 +1,6 @@
 # MULTI SQS Deployment
-
+This project will create an SQS queue with the name multi-sqs-<REGION>. 
+The SQS queues will be created in 6 regions and 2 AWS accounts. 
 ## Initialize
 ```
 terraform init \
