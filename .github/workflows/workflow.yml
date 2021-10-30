@@ -21,7 +21,7 @@ jobs:
         uses: snyk/actions/setup@0.3.0
 
       - name: Checking Terraform Code for security vulnerabilities
-        run: snyk iac test
+        run: snyk iac test --severity-threshold=critical
         env:
           SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
 
