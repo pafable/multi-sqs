@@ -1,0 +1,7 @@
+.dccache
+.terraform
+plan
+*.lock.hcl
+*state*
+init.txt
+*vars.tfvars
