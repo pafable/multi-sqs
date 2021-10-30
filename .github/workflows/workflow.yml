@@ -42,7 +42,7 @@ jobs:
 
       - name: Creating Terraform Plan
         run: |
-          terraform workspace new Dev || terraform workspace select Dev
+          terraform workspace new dev || terraform workspace select dev
           terraform plan \
             -var='workspace_iam_roles={"dev":"${{ secrets.DEV_AWS_ROLE }}","prod":"${{ secrets.PROD_AWS_ROLE }}"}' \
             -out plan
